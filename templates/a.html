@@ -1,0 +1,315 @@
+<html><head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Applicant Registration</title>
+        <link href="mainlogo.png" type="Image/x-icon" rel="icon">
+        <style>
+            input.datepicker{
+                /*background:  url(../../resources/Image/calendar.gif) right no-repeat;*/
+                background:  url(../../resources/Image/date-edit-button.png) right no-repeat;
+                background-color: #ffffff
+            }
+        </style>
+        <script>
+            var applnSubURL = "../../application/transaction/applicantRegistrationInner.jsp";
+             var currentDate="2020-12-19";
+             var arr =currentDate.split("-");
+             var currentyear=arr[0];
+             var minyear=parseFloat(currentyear)-15;
+            var frmTitle="NEW APPLICANT REGISTRATION";
+            $(function() {
+                $("button").button().keypress(function(event) {
+                    event.getPreventDefault();
+                });
+                
+                funDOBDatePicker('1966:'+minyear);
+                
+                $("#btSave").on('click', function() {
+                    funSave();
+                });
+                $("#btReset").on('click', function() {
+                    funReset();
+                });
+
+                $("#btLogin").on('click', function() {
+                    top.location = "../../application/loginManager/youLogin.jsp";
+                });
+                
+                $("#frmApplicantRegistration:input").tooltip({
+
+                    // place tooltip on the right edge
+                    position: "center right",
+
+                    // a little tweaking of the position
+                    offset: [-2, 10],
+
+                    // use the built-in fadeIn/fadeOut effect
+                    effect: "fade",
+
+                    // custom opacity setting
+                    opacity: 0.7
+
+                    });
+                
+            });
+            
+            
+            function funDOBDatePicker(argrange){
+                $('.datepicker:not(#txt_DateofBirth)').datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    showAnim: 'fold',
+                    dateFormat: "dd-mm-yy",
+                    direction: "down",
+                });
+
+                $("#txt_DateofBirth").datepicker({
+                    minDate:$("#hdnDOBMinDate").val(),//  '2013-09-10',
+                    maxDate: $("#hdnDOBMaxDate").val(),
+                    //minDate: new Date(1970, 1 - 1, 1), maxDate: '-18Y',
+                    dateFormat: 'dd-mm-yy',
+                    defaultDate: $("#hdnDOBMinDate").val(),//new Date(1970, 1 - 1, 1),
+                    changeMonth: true,
+                    changeYear: true,
+                    //yearRange: '-30:-16',
+                    yearRange: argrange,
+                        onSelect: function(selectedDate) {
+                     },
+                    onClose: function(dateText, inst) {
+                        var validDate = $.datepicker.formatDate("dd-mm-yy", $('#txt_DateofBirth').datepicker('getDate'));
+                        $('#txt_DateofBirth').datepicker('setDate', validDate);
+                        $("#txt_Mobile").focus();
+                    }
+                });
+            }
+            
+            function funSelectApplicationCategory(){
+                
+                if ($("#applicationCategoryId").val()==5 || $("#applicationCategoryId").val()==7 ){
+                    var ugminyear=parseFloat(currentyear)-16;
+                    var minugyear=parseFloat(currentyear)-27;
+                    funDOBDatePicker(minugyear+':'+ugminyear);
+                    
+                        $('#txt_DateofBirth').datepicker("option", "minDate","01-01-"+minugyear) ;
+                       $('#txt_DateofBirth').datepicker("option", "maxDate","31-12-"+ugminyear);
+                    
+//                    $('#txt_DateofBirth').datepicker('option', 'minDate', new Date($("#hdnDOBMinDate").val()));
+//                    $('#txt_DateofBirth').datepicker('option', 'maxDate', new Date($("#hdnDOBMinDate").val()));
+                }else if ($("#applicationCategoryId").val()==2 || $("#applicationCategoryId").val()==6){
+                    if ($("#applicationCategoryId").val()==2){
+                        funLoadPGInstructions();
+                    }
+                    var pgminyear=parseFloat(currentyear)-19;
+                    var minpgyear=parseFloat(currentyear)-64;
+                    funDOBDatePicker(minpgyear+':'+pgminyear);
+                       $('#txt_DateofBirth').datepicker("option", "minDate","01-01-"+minpgyear) ;
+                       $('#txt_DateofBirth').datepicker("option", "maxDate","31-12-"+pgminyear);
+                }
+                
+            }
+            
+            function funSendMailAndSMS(argApplicantId) {
+                var applnparameter = $('#frmApplicantRegistration').serializeArray();
+                applnparameter.push({name: "ids", value: "2"});
+                applnparameter.push({name: "filter", value: ""});
+                applnparameter.push({name: "applicantId", value: argApplicantId});
+                $("#divEmailSMSResultInfo").html("<table width='100%'><tr><td align='center'>Please wait....<img src='../../resources/Image/loading.gif'></td></tr></table>");
+                $("#divEmailSMSResultInfo").show();
+                $.post(applnSubURL, applnparameter, function(data) {
+                    if (data.resultstatus == 1) {
+                        $('#divEmailSMSResultInfo').show();
+                        $('#divEmailSMSResultInfo').html(data.result);
+//                        alert(data.result);
+//                        top.location = "../../application/loginManager/youLogin.jsp";
+                    } else {
+                        $('#divEmailSMSResultInfo').show();
+                        $('#divEmailSMSResultInfo').html(data.result);
+
+                    }
+                }, "json").error(function(jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseText);
+                })
+            }
+            
+            function superAlert(argTitle, argMsg, argObject,argSessionStatus) {
+                try {
+                    var dialogHtml = "<p><span class='ui-icon ui-icon-circle-close' style='float:left; margin:0 7px 50px 0;'></span>" +
+                            argMsg + "</p>";
+                    $("#divAlert").html(dialogHtml);
+                    $("#divAlert").attr("title", argTitle);
+                    $("#divAlert").dialog({
+                        modal: true,
+                        buttons: {
+                            "Ok": function() {
+                                $(this).dialog("close");
+                                $("#" + argObject).focus();
+                           }
+                        }
+                    });
+                    return;
+                } catch (e) {
+                }
+            }
+            
+            function funSave() {
+                $("#frmApplicantRegistration").validationEngine('attach', {
+                    binded: true, showOneMessage: true, maxErrorsPerField: 1
+                });
+                if (!($('#frmApplicantRegistration').validationEngine('validate', {autoHidePrompt: true, showOneMessage: true, maxErrorsPerField: 1})))
+                    return;
+                $('#frmApplicantRegistration').removeProp('disabled');
+                var applicationCategoryId=parseFloat($("#applicationCategoryId").val());
+                if (applicationCategoryId==0){
+                    superAlert(frmTitle, "Select application category", "applicationCategoryId");
+                    return false;
+                }
+                var applnparameter = $('#frmApplicantRegistration').serializeArray();
+                applnparameter.push({name: "ids", value: "1"});
+                applnparameter.push({name: "filter", value: ""});
+                $("#divResultInfo").html("<table width='100%'><tr><td align='center'>Please wait....<img src='../../resources/Image/loading.gif'></td></tr></table>");
+                $("#divResultInfo").show();
+                $("#btSave").hide();
+                $.post(applnSubURL, applnparameter, function(data) {
+                    if (data.resultstatus == 1) {
+                        $("#divResultInfo").hide();
+                        funSendMailAndSMS(data.ApplicantId);
+//                        alert(data.result);
+                        $("#divRegistrationDetails").html(data.result);
+                        $("#divRegistrationDetails").show();
+                    } else {
+                        $('#divResultInfo').show();
+                        $('#divResultInfo').html(data.result);
+                        $("#btSave").show();
+                    }
+                }, "json").error(function(jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseText);
+                })
+            }
+            function funReset() {
+                $("#divRegistrationDetails").hide();
+                $("#divResultInfo").hide();
+                $(".clsReg").val("");
+                $("#btSave").show();
+                $("#txtISDCode").val("91");
+            }
+            
+            function funLoadPGInstructions(){
+                $("#divAlert").attr("title", frmTitle);
+                $("#divAlert").dialog({
+                    modal: true,
+                    height : 600,
+                    width : 700,
+                    buttons: {
+                        "Ok": function() {
+                            $(this).dialog("close");
+                       }
+                    }
+                });
+                var applnparameter = [];
+                applnparameter.push({name: "ids", value: "6"});
+                applnparameter.push({name: "filter", value: ""});
+                $.post(applnSubURL, applnparameter, function (data) {
+                    $("#divAlert").html(data);
+                    $("#divAlert").show();
+                }, "html").error(function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseText);
+                });
+            }
+        </script>
+    <style>._3emE9--dark-theme .-S-tR--ff-downloader{background:rgba(30,30,30,.93);border:1px solid rgba(82,82,82,.54);box-shadow:0 4px 7px rgba(30,30,30,.55);color:#fff}._3emE9--dark-theme .-S-tR--ff-downloader ._6_Mtt--header ._2VdJW--minimize-btn{background:#3d4b52}._3emE9--dark-theme .-S-tR--ff-downloader ._6_Mtt--header ._2VdJW--minimize-btn:hover{background:#131415}._3emE9--dark-theme .-S-tR--ff-downloader ._10vpG--footer{background:rgba(30,30,30,.93)}._2mDEx--white-theme .-S-tR--ff-downloader{background:#fff;border:1px solid rgba(82,82,82,.54);box-shadow:0 4px 7px rgba(30,30,30,.55);color:#314c75}._2mDEx--white-theme .-S-tR--ff-downloader ._6_Mtt--header{font-weight:700}._2mDEx--white-theme .-S-tR--ff-downloader ._2dFLA--container ._2bWNS--notice{border:0;color:rgba(0,0,0,.88)}._2mDEx--white-theme .-S-tR--ff-downloader ._10vpG--footer{background:#fff}.-S-tR--ff-downloader{display:block;overflow:hidden;position:fixed;bottom:20px;right:7.1%;width:330px;height:180px;background:rgba(30,30,30,.93);border-radius:2px;color:#fff;z-index:99999999;border:1px solid rgba(82,82,82,.54);box-shadow:0 4px 7px rgba(30,30,30,.55);transition:.5s}.-S-tR--ff-downloader._3M7UQ--minimize{height:62px}.-S-tR--ff-downloader._3M7UQ--minimize .nxuu4--file-info,.-S-tR--ff-downloader._3M7UQ--minimize ._6_Mtt--header{display:none}.-S-tR--ff-downloader ._6_Mtt--header{padding:10px;font-size:17px;font-family:sans-serif}.-S-tR--ff-downloader ._6_Mtt--header ._2VdJW--minimize-btn{float:right;background:#f1ecec;height:20px;width:20px;text-align:center;padding:2px;margin-top:-10px;cursor:pointer}.-S-tR--ff-downloader ._6_Mtt--header ._2VdJW--minimize-btn:hover{background:#e2dede}.-S-tR--ff-downloader ._13XQ2--error{color:red;padding:10px;font-size:12px;line-height:19px}.-S-tR--ff-downloader ._2dFLA--container{position:relative;height:100%}.-S-tR--ff-downloader ._2dFLA--container .nxuu4--file-info{padding:6px 15px 0;font-family:sans-serif}.-S-tR--ff-downloader ._2dFLA--container .nxuu4--file-info div{margin-bottom:5px;width:100%;overflow:hidden}.-S-tR--ff-downloader ._2dFLA--container ._2bWNS--notice{margin-top:21px;font-size:11px}.-S-tR--ff-downloader ._10vpG--footer{width:100%;bottom:0;position:absolute;font-weight:700}.-S-tR--ff-downloader ._10vpG--footer ._2V73d--loader{-webkit-animation:n0BD1--rotation 3.5s linear forwards;animation:n0BD1--rotation 3.5s linear forwards;position:absolute;top:-120px;left:calc(50% - 35px);border-radius:50%;border:5px solid #fff;border-top-color:#a29bfe;height:70px;width:70px;display:flex;justify-content:center;align-items:center}.-S-tR--ff-downloader ._10vpG--footer ._24wjw--loading-bar{width:100%;height:18px;background:#dfe6e9;border-radius:5px}.-S-tR--ff-downloader ._10vpG--footer ._24wjw--loading-bar ._1FVu9--progress-bar{height:100%;background:#8bc34a;border-radius:5px}.-S-tR--ff-downloader ._10vpG--footer ._2KztS--status{margin-top:10px}.-S-tR--ff-downloader ._10vpG--footer ._2KztS--status ._1XilH--state{float:left;font-size:.9em;letter-spacing:1pt;text-transform:uppercase;width:100px;height:20px;position:relative}.-S-tR--ff-downloader ._10vpG--footer ._2KztS--status ._1jiaj--percentage{float:right}</style></head>
+    <body>
+        <form name="frmApplicantRegistration" id="frmApplicantRegistration" autocomplete="off" method="POST">
+            <table cellpadding="5" cellspacing="2" class="ui-corner-all" align="center" width="70%" id="tblApplicantRegistration">
+                <tbody><tr>
+                    <td colspan="2">
+                        <table width="60%" align="center" style="border:0px solid black;padding:5px;">
+                            <tbody><tr>
+                                <td width="20%" valign="top" align="right" style="border:0px solid black;padding:5px;">
+                                    <img alt="Photo not found" src="mainlogo.png" width="100px" height="100px">
+                                </td>
+                                <td valign="top" width="50%" align="center" style="border:0px solid black;padding:5px;">
+                                    <table>
+                                        <tbody><tr>
+                                            <td align="center" nowrap="" style="border:0px solid black;padding:5px;">
+                                                <font style="font-size: 20pt;font-weight: bold;"> AJ INSTITUTE OF TECHNOLOGY </font>
+                                                <br><font style="font-size: 10pt;font-weight: bold;"> (AFFILIATED TO THE UNIVERSITY OF MADRAS) </font>
+                                                <br><font style="font-size: 12pt;font-weight: bold;"> CHENNAI - 600 034. </font>
+                                            </td>
+                                        </tr>
+                                    </tbody></table>
+                                </td>
+                            </tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <table cellpadding="5" width="100%" class="ui-corner-all ui-widget-content">
+                            <tbody><tr>
+                                <td colspan="2" align="center" class="header ui-corner-all" style="font-weight: bold;font-size: 12pt; height: 40px;">NEW APPLICANT REGISTRATION</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="right" style="font-style: italic;color: red;font-weight: bold;">
+                                    *All fields are mandatory
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="150px"><label>Application Category<font color="red">*</font></label></td>
+                                <td>
+                                    <select style="width:300px;" name="applicationCategoryId" id="applicationCategoryId" onchange="funSelectApplicationCategory()">
+                                        <option value="0" selected="">Select Application Category</option>
+                                        
+                                            <option value="6">M.Phil Application</option>
+                                            <option value="6">M.Tech Application</option>
+                                            <option value="6">IIT Application</option>
+                                            <option value="6">B.Tech Application</option>
+                                            <option value="6">M.Sc Application</option>
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="20%" valign="top"><label>Applicant Name<font color="red">*</font></label></td>
+                                <td valign="top"><input type="Text" name="txt_Applicant" id="txt_Applicant" maxlength="75" class="clsReg validate[required,custom[onlyforName],maxSize[75],minSize[3]" style="width:50%"> &nbsp;&nbsp;<font style="font-style: italic;color: red;font-weight: bold;">[Name as in 10th Mark Statement]</font></td>
+                            </tr>
+                            <tr>
+                                <td width="20%"><label>Date Of Birth<font color="red">*</font></label></td>
+                                <td><input type="text" name="txt_DateofBirth" id="txt_DateofBirth" style="width:25%" maxlength="10" readonly="" class="clsReg datepicker text-input validate[required,custom[dateDDMMYYYY] hasDatepicker"><font style="font-style: italic;color: red;font-weight: bold;">[DD-MM-YYYY]</font></td>
+                            </tr>
+                            <tr>
+                                <td width="20%"><label>Mobile No.<font color="red">*</font></label></td>
+                                <td>+<input type="Text" name="txtISDCode" id="txtISDCode" maxlength="3" style="width:7%" class="clsReg validate[required]" size="1" value="91" onkeypress="return NumbersOnly(event)">&nbsp;&nbsp;<input type="Text" name="txt_Mobile" id="txt_Mobile" style="width:25%" maxlength="10" class="clsReg validate[required,custom[numberwithcomma],minSize[10],maxSize[10]]" onkeypress="return NumbersOnly(event)"></td>
+                            </tr> 
+                            <tr>
+                                <td width="20%"><label>Parent's Mobile No.<font color="red">*</font></label></td>
+                                <td>+<input type="Text" name="txtParentISDCode" id="txtParentISDCode" maxlength="3" style="width:7%" class="clsReg validate[required]" size="1" value="91" onkeypress="return NumbersOnly(event)">&nbsp;&nbsp;<input type="Text" name="txt_ParentMobile" id="txt_ParentMobile" style="width:25%" maxlength="10" class="clsReg validate[required,custom[numberwithcomma],minSize[10],maxSize[10]]" onkeypress="return NumbersOnly(event)"></td>
+                            </tr> 
+                            <tr>
+                                <td width="20%"><label>Email ID<font color="red">*</font></label></td>
+                                <td><input type="Text" name="txt_Email" id="txt_Email" maxlength="35" title="Enter your valid mail id" class="tooltip clsReg validate[required,custom[email]]" style="width:45%"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <div id="divRegistrationDetails" style="display:none;"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="center">
+                                    <div id="divAlert" style="display:none"></div>
+                                    <div id="divResultInfo" style="display:none"></div>
+                                    <div id="divEmailSMSResultInfo" style="display:none"></div>
+                                    <input type="button" class="button button2" value="Register" id="btSave">
+                                    <input type="button" class="button button2" value="Login Page" id="btLogin">
+                                    <input type="button" class="button button2" value="Reset" id="btReset">
+                                    <input type="hidden" id="hdnDOBMinDate" value="01-01-1992" name="hdnDOBMinDate">
+                                    <input type="hidden" id="hdnDOBMaxDate" value="31-12-2003" name="hdnDOBMaxDate">
+                                </td>
+                            </tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                
+            </tbody></table>
+        </form>
+    
+
+<div id="ui-datepicker-div" class="ui-datepicker ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"></div></body></html>

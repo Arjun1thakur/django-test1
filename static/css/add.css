@@ -1,0 +1,22 @@
+body{
+    margin: 0;
+    padding: 0;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background: black;
+    background-size: cover;
+    color: blanchedalmond;
+}
+.Data{
+    width: 200px;
+    height: 250px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-80%,-80%);
+    color: white;
+}
+.Head{
+    margin: 0;
+    padding: 0;
+    position:center;
+}

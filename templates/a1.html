@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block head %}{% endblock head%}
+{% block body %}
+<form name="frmApplicantRegistration" id="frmApplicantRegistration" autocomplete="off" method="POST">
+    <table cellpadding="5" cellspacing="2" class="ui-corner-all" align="center" width="70%" id="tblApplicantRegistration">
+        <tbody><tr>
+            <td colspan="2">
+                <table width="60%" align="center" style="border:0px solid black;padding:5px;">
+                    <tbody><tr>
+                        <td width="20%" valign="top" align="right" style="border:0px solid black;padding:5px;">
+                            <img alt="Photo not found" src="./Applicant Registration_files/mainlogo.png" width="100px" height="100px">
+                        </td>
+                        <td valign="top" width="50%" align="center" style="border:0px solid black;padding:5px;">
+                            <table>
+                                <tbody><tr>
+                                    <td align="center" nowrap="" style="border:0px solid black;padding:5px;">
+                                        <font style="font-size: 20pt;font-weight: bold;"> AJ INSTITUTE OF TECHNOLOGY </font>
+                                        <br><font style="font-size: 10pt;font-weight: bold;"> (AFFILIATED TO THE UNIVERSITY OF AGRA) </font>
+                                        <br><font style="font-size: 12pt;font-weight: bold;"> AGRA - 283082. </font>
+                                    </td>
+                                </tr>
+                            </tbody></table>
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table cellpadding="5" width="100%" class="ui-corner-all ui-widget-content">
+                    <tbody><tr>
+                        <td colspan="2" align="center" class="header ui-corner-all" style="font-weight: bold;font-size: 12pt; height: 40px;">NEW APPLICANT REGISTRATION</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="right" style="font-style: italic;color: red;font-weight: bold;">
+                            *All fields are mandatory
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="150px"><label>Application Category<font color="red">*</font></label></td>
+                        <td>
+                            <select style="width:300px;" name="applicationCategoryId" id="applicationCategoryId" onchange="funSelectApplicationCategory()">
+                                <option value="0" selected="">Select Application Category</option>
+                                    <option value="6">M.Sc Application</option>
+                                    <option value="6">M.Tech Application</option>
+                                    <option value="6">M.C.A Application</option>
+                                    <option value="6">M.A Application</option>
+                                    <option value="6">M.Phil Application</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="20%" valign="top"><label>Applicant Name<font color="red">*</font></label></td>
+                        <td valign="top"><input type="Text" name="txt_Applicant" id="txt_Applicant" maxlength="75" class="clsReg validate[required,custom[onlyforName],maxSize[75],minSize[3]" style="width:50%"> &nbsp;&nbsp;<font style="font-style: italic;color: red;font-weight: bold;">[Name as in 10th Mark Statement]</font></td>
+                    </tr>
+                    <tr>
+                        <td width="20%"><label>Date Of Birth<font color="red">*</font></label></td>
+                        <td><input type="text" name="txt_DateofBirth" id="txt_DateofBirth" style="width:25%" maxlength="10" readonly="" class="clsReg datepicker text-input validate[required,custom[dateDDMMYYYY] hasDatepicker"><font style="font-style: italic;color: red;font-weight: bold;">[DD-MM-YYYY]</font></td>
+                    </tr>
+                    <tr>
+                        <td width="20%"><label>Mobile No.<font color="red">*</font></label></td>
+                        <td>+<input type="Text" name="txtISDCode" id="txtISDCode" maxlength="3" style="width:7%" class="clsReg validate[required]" size="1" value="91" onkeypress="return NumbersOnly(event)">&nbsp;&nbsp;<input type="Text" name="txt_Mobile" id="txt_Mobile" style="width:25%" maxlength="10" class="clsReg validate[required,custom[numberwithcomma],minSize[10],maxSize[10]]" onkeypress="return NumbersOnly(event)"></td>
+                    </tr> 
+                    <tr>
+                        <td width="20%"><label>Parent's Mobile No.<font color="red">*</font></label></td>
+                        <td>+<input type="Text" name="txtParentISDCode" id="txtParentISDCode" maxlength="3" style="width:7%" class="clsReg validate[required]" size="1" value="91" onkeypress="return NumbersOnly(event)">&nbsp;&nbsp;<input type="Text" name="txt_ParentMobile" id="txt_ParentMobile" style="width:25%" maxlength="10" class="clsReg validate[required,custom[numberwithcomma],minSize[10],maxSize[10]]" onkeypress="return NumbersOnly(event)"></td>
+                    </tr> 
+                    <tr>
+                        <td width="20%"><label>Email ID<font color="red">*</font></label></td>
+                        <td><input type="Text" name="txt_Email" id="txt_Email" maxlength="35" title="Enter your valid mail id" class="tooltip clsReg validate[required,custom[email]]" style="width:45%"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div id="divRegistrationDetails" style="display:none;"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center">
+                            <div id="divAlert" style="display:none"></div>
+                            <div id="divResultInfo" style="display:none"></div>
+                            <div id="divEmailSMSResultInfo" style="display:none"></div>
+                            <input type="button" class="button button2" value="Register" id="btSave">
+                            <input type="button" class="button button2" value="Login Page" id="btLogin">
+                            <input type="button" class="button button2" value="Reset" id="btReset">
+                            <input type="hidden" id="hdnDOBMinDate" value="01-01-1992" name="hdnDOBMinDate">
+                            <input type="hidden" id="hdnDOBMaxDate" value="31-12-2003" name="hdnDOBMaxDate">
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+    </tbody></table>
+</form>
+<div id="ui-datepicker-div" class="ui-datepicker ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"></div>
+{% endblock body %}

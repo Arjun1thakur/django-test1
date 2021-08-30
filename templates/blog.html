@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container">
+<div id="accordion">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="text-center">
+                <td align="center" nowrap="" style="border:0px solid black;padding:5px;">
+                    <font style="font-size: 20pt;font-weight: bold;"> AJ INSTITUTE OF TECHNOLOGY </font>
+                    <br><font style="font-size: 10pt;font-weight: bold;"> (AFFILIATED TO THE UNIVERSITY OF AGRA) </font>
+                    <br><font style="font-size: 12pt;font-weight: bold;"> AGRA - 283082. </font>
+                </td>
+            </div>
+        </div>
+    </div>
+</div>
+<div class='container-fluid'>
+    <form>
+    <div class="mb-3">
+        <label for="Email-address" class="form-label">Email-address</label>
+        <input type="email" class="form-control" id="email" aria-describedby="emailHelp">
+        <div id="emailHelp" class="form-text">Enter Valid Email-Id.</div>
+    </div>
+    <div class="mb-3">
+        <label for="User-ID" class="form-label">User-ID</label>
+        <input type="text" class="form-control" id="text" aria-describedby="User-ID">
+        <div id="User-ID" class="form-text">Enter Valid User-Id.</div>
+    </div>
+    <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label">Enter Your Thought</label>
+        <input type="text" class="form-control" id="text">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock body %}
